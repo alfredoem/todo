@@ -3,7 +3,7 @@
 
     <main>
         <ul id="todo-list" class="collection with-header">
-            <li class="collection-header"><h4 class="red-text">TODO</h4></li>
+            <li class="collection-header"><h4 class="red-text">TODO VueJS</h4></li>
             <li><div class="loader">Loading...</div></li>
         </ul>
 
