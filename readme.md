@@ -1,9 +1,17 @@
 TODO List
 =========
 
+### Installation
 
+run
 
+    composer install
+    npm install
 
+### Configuration
+create .env file  and run
+
+    php artisan migrate
 
 ### License
 
