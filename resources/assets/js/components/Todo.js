@@ -8,7 +8,6 @@ class Todo {
         var request = $.ajax({url: 'todo/' + id, type: 'patch', data: form.serialize()});
 
         request.done(function(res){
-            console.log(res);
             $(`#task_span_${id}`).html(res.task);
             $('#view_' + id).show();
             $('#edit_' + id).hide();
@@ -26,13 +25,13 @@ class Todo {
 
     edit(id) {
         let text = $('#task_span_' + id).html();
-        console.log('Aloha!');
         $('#view_' + id).hide();
         $('#edit_' + id).show();
         $(`#task_input_${id}`).val(text.trim()).select();
     }
     
     createCancel() {
+        $('.task-create-cancel').hide();
         $('#task_0').remove();
         $('.task-create').show();
     }
@@ -72,65 +71,21 @@ class Todo {
     }
 
     store() {
-        let form = $('#task_form_0');
-        var request = $.ajax({url: 'todo', type: 'post', data: form.serialize()});
-
+        let form_data = $('#task_form_0').serialize();
+        let url = (this.getActivePage()) ? `todo?page=${this.getActivePage()}` : 'todo';
+        let request = $.ajax({url: url, type: 'post', data: form_data});
+        let self = this;
         request.done(function(res){
-            location.reload();
-
-            /*let task = $('#task_0');
-            let token = $('#_token').val();
-            task.remove();*/
-
-            /*let li = `<li id="task_${res.id}" class="collection-item">
-                    <div id="view_${res.id}" class="view-mode">
-                        <span id="task_span_${res.id}">${res.task}</span>
-                        
-                        <a href="javascript:void(0)" class="secondary-content task-delete-dialog
-                            red-text text-accent-2"
-                           data-task-id="${res.id}" title="Delete Task">
-                            <i class="material-icons">delete</i>
-                        </a>
-                        
-                        <a href="javascript:void(0)" class="secondary-content task-edit"
-                           data-task-id="${res.id}">
-                            <i class="material-icons">mode_edit</i>
-                        </a>
-                    </div>
-                    
-                    <div id="edit_${res.id}" class="edit-mode" style="display: none">
-                        <form id="task_form_${res.id}" class="col s10">
-                            <input type="hidden" name="_token" value="${token}">
-                            <div class="row">
-                                <div class="input-field col s10">
-                                    <input placeholder="Enter task name" id="task_input_${res.id}"
-                                           type="text" class="validate" name="task" 
-                                           data-task-id="${res.id}">
-                                </div>
-                                <div class="col s2">
-                                    <a href="javascript:void(0)" class="secondary-content task-update"
-                                       data-task-id="${res.id}">
-                                        <i class="medium material-icons">done</i>
-                                    </a>
-                                </div>
-                            </div>
-
-                        </form>
-
-                    </div>
-                </li>`;
-
-            let list = $('#todo-list');
-
-            list.find('li:eq(0)').after(li);
-
-            if (list.find('li').length == 9) {
-                list.find('li').last().remove();
-            }
-
+            self.renderTodo(res);
             $('.task-create-cancel').hide();
-            $('.task-create').show();*/
+            $('.task-create').show();
         });
+    }
+
+    getActivePage() {
+        let container = $('.pagination');
+        let active = container.find('li.active');
+        return (container.length && active.length) ? active.find('span').html().trim() : null;
     }
 
     deleteDialog(id) {
@@ -140,7 +95,6 @@ class Todo {
         $(`#task_${id}`).addClass('red accent-1');
 
         modal.data('target-id', id);
-
         modal.find('#task-to-delete-text').html(task.html().trim());
         modal.openModal();
     }
@@ -150,63 +104,88 @@ class Todo {
         let id = modal.data('target-id');
         $(`#task_${id}`).removeClass('red accent-1');
         modal.closeModal();
-
     }
     
     delete() {
         let modal = $('#modal-task-delete');
         let id = modal.data('target-id');
-        let request = $.ajax({url: `todo/${id}`, type: 'delete', data: {_token: $('#_token').val()}});
+        let url = (this.getActivePage()) ? `todo/${id}?page=${this.getActivePage()}`
+                                         : `todo/${id}`;
+        let request = $.ajax({url: url, type: 'delete', data: {_token: $('#_token').val()}});
+        let self = this;
+
         request.done(function(res){
-            location.reload();
+            modal.closeModal();
+            self.renderTodo(res);
         });
     }
 
     renderTodo(res) {
-        console.log('render');
         let list = $('#todo-list');
         let collection = list.find('li:eq(0)').prop('outerHTML');
         list.empty();
 
-        for (let i in res.data) {
-            collection += this.li(res.data[i]);
-        }
+        if (res.data.length) {
+            for (let i in res.data) {
+                collection += this.li(res.data[i]);
+            }
 
-        list.append(collection);
-        this.renderPagination(res)
+            list.append(collection);
+            this.renderPagination(res)
+        } else {
+            list.append(collection);
+            list.append(`<li class="collection-item grey lighten-4 grey-text">
+                        [ Add Your first Task ]
+                        </li>`);
+        }
     }
 
     renderPagination(res) {
         let pagination = '';
-        let container = $('.pagination');
-        let url = location.protocol + "//" + location.host;
 
-        let prev = (res.prev_page_url === null)
-                        ? `<li><span> << </span></li>`
-                        : `<li><a href="${res.prev_page_url}"> << </a></li>`;
-
-        let next = (res.next_page_url === null)
-                        ? `<li><span> >> </span></li>`
-                        : `<li><a href="${res.next_page_url}"> >> </a></li>`;
-
-        pagination += prev;
-
-        for (let i = 1; i <= res.last_page; i++) {
-
-            let li = `<li><a href="${url}?page=${i}" >${i}</a></li>`;
-
-            if (res.current_page == i) {
-                li = `<li class="active"><span class="active">${i}</span></li>`;
-            }
-
-            pagination += li;
+        if ( ! $('.pagination').length && res.data.length) {
+            console.log('create pagination ul');
+            $('#pagination-container').append(`<ul class="pagination"></ul>`)
         }
 
-        pagination += next;
+        let container = $('.pagination');
 
-        console.log(`Current page: ${res.current_page}`);
 
-        container.empty().append(pagination);
+        if (res.data.length) {
+
+            container.empty();
+
+            if (res.last_page > 1) {
+
+                let url = location.protocol + "//" + location.host;
+
+                let prev = (res.prev_page_url === null)
+                    ? `<li><span> << </span></li>`
+                    : `<li><a href="${res.prev_page_url}"> << </a></li>`;
+
+                let next = (res.next_page_url === null)
+                    ? `<li><span> >> </span></li>`
+                    : `<li><a href="${res.next_page_url}"> >> </a></li>`;
+
+                pagination += prev;
+
+                for (let i = 1; i <= res.last_page; i++) {
+
+                    let li = `<li><a href="${url}?page=${i}">${i}</a></li>`;
+
+                    if (res.current_page == i) {
+                        li = `<li class="active"><span class="active">${i}</span></li>`;
+                    }
+
+                    pagination += li;
+                }
+
+                pagination += next;
+                container.append(pagination);
+            }
+
+        }
+
     }
     
     li (res) {
@@ -238,9 +217,15 @@ class Todo {
                                            data-task-id="${res.id}">
                                 </div>
                                 <div class="col s2">
-                                    <a href="javascript:void(0)" class="secondary-content task-update"
-                                       data-task-id="${res.id}">
-                                        <i class="medium material-icons">done</i>
+                                <a href="javascript:void(0)" class="secondary-content 
+                                        task-edit-cancel red-text text-accent-2" 
+                                         data-task-id="${res.id}">
+                                        <i class="material-icons font-35">not_interested</i>
+                                    </a>
+                                    
+                                    <a href="javascript:void(0)" class="secondary-content 
+                                     task-update" data-task-id="${res.id}">
+                                        <i class="material-icons font-35">done</i>
                                     </a>
                                 </div>
                             </div>

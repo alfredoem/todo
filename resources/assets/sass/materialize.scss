@@ -76,3 +76,13 @@ $fonts_path: '../../fonts';
 .font-35 {
   font-size: 35px;
 }
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}

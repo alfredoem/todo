@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TODO</title>
+    <title>Seventh Heaven</title>
     <link rel="stylesheet" href="{{asset('css/main/materialize.min.css')}}">
 </head>
 <body>
@@ -11,5 +11,6 @@
 @yield('container')
 
 @include('layouts.partials.foot')
+@include('layouts.partials.footer')
 </body>
 </html>

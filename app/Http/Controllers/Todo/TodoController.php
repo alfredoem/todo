@@ -5,17 +5,31 @@ namespace App\Http\Controllers\Todo;
 use App\Components\Todo\Todo;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 
 class TodoController extends Controller
 {
     public function index()
     {
-        return "Aloha!";
+        return Todo::orderBy('id', 'desc')->paginate(7)->setPath(url('todo'));
     }
 
     public function destroy($id)
     {
         Todo::destroy($id);
+
+        $todo = $this->index();
+
+        if ($todo->isEmpty()) {
+
+            Paginator::currentPageResolver(function () {
+                return (request()->page > 1) ? request()->page - 1 : request()->page;
+            });
+
+            $todo = $this->index();
+        }
+
+        return $todo;
     }
 
     public function update(Request $request, $id)
@@ -36,7 +50,7 @@ class TodoController extends Controller
         $task->createdAt = date('Y-m-d H:m:s');
         $task->save();
 
-        return $task;
+        return $this->index();
     }
 
 

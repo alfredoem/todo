@@ -12,7 +12,6 @@ $(document).on('click', '.task-create', function(e){
 $(document).on('click', '.task-create-cancel', function(e){
     e.preventDefault();
     console.log('task-create-cancel');
-    $('.task-create-cancel').hide();
     Todo.createCancel();
 });
 
@@ -24,26 +23,27 @@ $(document).on('click', '.task-store', function(e){
 
 $(document).on("keypress", "input", function(e) {
 
-
     if (e.keyCode == 13) {
         e.preventDefault();
         let id = $(this).data('task-id');
 
         if ($('#task_0').length) {
-
-            console.log('I Could die for you');
-
             Todo.store();
         } else {
             Todo.update(id);
         }
 
-
         return false;
+    } else if (e.keyCode == 27) {
+        let id = $(this).data('task-id');
+        if (id == 0) {
+            Todo.createCancel();
+        } else {
+            Todo.editCancel(id);
+        }
     }
 
 });
-
 
 $(document).on('click', '.task-edit', function(e){
     e.preventDefault();
@@ -84,19 +84,18 @@ $(document).on('click', '.task-delete', function(e){
     Todo.delete();
 });
 
-$(function() {
-    $('main').on('click', '.pagination a', function (e) {
-        $('.pagination').find('li').removeClass('active disabled');
 
-        $(this).parent().addClass('active');
-        getTodo($(this).attr('href').split('page=')[1]);
-        e.preventDefault();
-    });
+$('main').on('click', '.pagination a', function (e) {
+    $('.pagination').find('li').removeClass('active disabled');
+
+    $(this).parent().addClass('active');
+    getTodo($(this).attr('href').split('page=')[1]);
+    e.preventDefault();
 });
 
 function getTodo(page) {
     $.ajax({
-        url : '?page=' + page,
+        url : 'todo?page=' + page,
         dataType: 'json'
     }).done(function (res) {
         Todo.renderTodo(res);
@@ -104,3 +103,7 @@ function getTodo(page) {
         alert('Posts could not be loaded.');
     });
 }
+
+$(document).ready(function(){
+    $('.task-delete-dialog').leanModal({dismissible: false});
+});

@@ -10,7 +10,8 @@
                 <li id="task_{{$row->id}}" class="collection-item">
                     <div id="view_{{$row->id}}" class="view-mode">
                         <span id="task_span_{{$row->id}}">{{$row->task}}</span>
-                        <a href="javascript:void(0)" class="secondary-content task-delete-dialog red-text text-accent-2"
+
+                        <a href="#modal-task-delete" class="secondary-content task-delete-dialog red-text text-accent-2"
                            data-task-id="{{$row->id}}" title="Delete Task">
                             <i class="material-icons">delete</i>
                         </a>
@@ -48,13 +49,15 @@
 
             @empty
 
-                <li class="collection-item">...ADD task</li>
+                <li class="collection-item grey lighten-4 grey-text">[ Add Your first Task ]</li>
 
             @endforelse
         </ul>
 
         <div id="pagination-container">
-            {!! $todo->render() !!}
+            @if(! empty($todo))
+                {!! $todo->render() !!}
+            @endif
         </div>
 
 
