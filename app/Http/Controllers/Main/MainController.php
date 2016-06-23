@@ -10,8 +10,7 @@ class MainController extends Controller
 
     public function getIndex()
     {
-        $todo = Todo::orderBy('id', 'desc')->paginate(7)->setPath(url('todo'));
-        return view('index', compact('todo'));
+        return view('index');
     }
 
 

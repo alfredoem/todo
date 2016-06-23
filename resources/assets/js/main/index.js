@@ -84,26 +84,14 @@ $(document).on('click', '.task-delete', function(e){
     Todo.delete();
 });
 
-
 $('main').on('click', '.pagination a', function (e) {
     $('.pagination').find('li').removeClass('active disabled');
-
     $(this).parent().addClass('active');
-    getTodo($(this).attr('href').split('page=')[1]);
+    Todo.all($(this).attr('href').split('page=')[1]);
     e.preventDefault();
 });
 
-function getTodo(page) {
-    $.ajax({
-        url : 'todo?page=' + page,
-        dataType: 'json'
-    }).done(function (res) {
-        Todo.renderTodo(res);
-    }).fail(function () {
-        alert('Posts could not be loaded.');
-    });
-}
-
 $(document).ready(function(){
     $('.task-delete-dialog').leanModal({dismissible: false});
+    Todo.all(1);
 });

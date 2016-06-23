@@ -1,19 +1,27 @@
 
 
 class Todo {
+    
+    all (page) {
+        
+        let request = $.ajax({url : 'todo?page=' + page, dataType: 'json'});
+        let self = this;
+        request.done(function (res) {
+            self.renderTodo(res);
+        }).fail(function () {
+            alert('Posts could not be loaded.');
+        });
+    }
 
     update(id) {
-
         let form = $(`#task_form_${id}`);
-        var request = $.ajax({url: 'todo/' + id, type: 'patch', data: form.serialize()});
+        let request = $.ajax({url: 'todo/' + id, type: 'patch', data: form.serialize()});
 
         request.done(function(res){
             $(`#task_span_${id}`).html(res.task);
             $('#view_' + id).show();
             $('#edit_' + id).hide();
         });
-
-
     }
 
     editCancel(id) {
