@@ -90,4 +90,7 @@ gulp.task('watch-materialize', function(){
 
 gulp.task('watch-script', function(){ return bundleScript(true)});
 
+gulp.task('default', ['materialize-css', 'roboto-fonts', 
+                      'material-icons', 'materialize-scripts', 'bundle-script']);
+
 
