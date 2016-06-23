@@ -7,9 +7,10 @@ run
 
     composer install
     npm install
+    gulp
 
 ### Configuration
-create .env file  and run
+create and configure your .env file  and run
 
     php artisan migrate
 
