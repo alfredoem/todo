@@ -3,10 +3,17 @@
 class Todo {
     
     all (page) {
-        
+        this.createCancel();
+
+        let container = $('#pagination-container');
+        container.fadeTo('slow', .6);
+        container.append('<div id="container-disabled" class="overlay"></div>');
+
         let request = $.ajax({url : 'todo?page=' + page, dataType: 'json'});
         let self = this;
         request.done(function (res) {
+            container.fadeTo('slow', 1);
+            container.find('#container-disabled').remove();
             self.renderTodo(res);
         }).fail(function () {
             alert('Posts could not be loaded.');
@@ -53,13 +60,14 @@ class Todo {
                     <div id="edit_0" class="edit-mode">
                         <form id="task_form_0" class="col s10">
                             <input type="hidden" name="_token" value="${token}">
-                            <div class="row">
+                            <div class="row valign-wrapper">
                                 <div class="input-field col s10">
-                                    <input placeholder="Enter task name" id="task_input_0"
-                                           type="text" class="validate" name="task" 
-                                            data-task-id="0">
+                                    <textarea id="task_input_0" name="task" 
+                                    class="materialize-textarea validate"
+                                     data-task-id="0" maxlength="255"></textarea>
+                                    <label for="task_input_0">Task Description</label>
                                 </div>
-                                <div class="col s2">
+                                <div class="col s2 valign">
                                     <a href="javascript:void(0)" class="secondary-content task-store"
                                        data-task-id="0">
                                         <i class="medium material-icons">done</i>
@@ -73,21 +81,28 @@ class Todo {
                 </li>`;
 
 
-        $('#todo-list').append(li);
+        $('#todo-list').find('li:eq(0)').after(li);
         $('#task_0').find('#task_input_0').focus();
 
     }
 
     store() {
-        let form_data = $('#task_form_0').serialize();
-        let url = (this.getActivePage()) ? `todo?page=${this.getActivePage()}` : 'todo';
-        let request = $.ajax({url: url, type: 'post', data: form_data});
-        let self = this;
-        request.done(function(res){
-            self.renderTodo(res);
-            $('.task-create-cancel').hide();
-            $('.task-create').show();
-        });
+        let input = $('#task_input_0');
+        if (input.val().trim()) {
+
+            let form_data = $('#task_form_0').serialize();
+            let url = (this.getActivePage()) ? `todo?page=${this.getActivePage()}` : 'todo';
+            let request = $.ajax({url: url, type: 'post', data: form_data});
+            let self = this;
+
+            request.done(function(res){
+                self.renderTodo(res);
+                $('.task-create-cancel').hide();
+                $('.task-create').show();
+            });
+        } else {
+            input.addClass('invalid').focus();
+        }
     }
 
     getActivePage() {
@@ -139,7 +154,8 @@ class Todo {
             }
 
             list.append(collection);
-            this.renderPagination(res)
+            this.renderPagination(res);
+            $('.task-delete-dialog').leanModal({dismissible: false});
         } else {
             list.append(collection);
             list.append(`<li class="collection-item grey lighten-4 grey-text">
@@ -200,32 +216,37 @@ class Todo {
         let token = $('#_token').val();
 
         return `<li id="task_${res.id}" class="collection-item">
-                    <div id="view_${res.id}" class="view-mode">
-                        <span id="task_span_${res.id}">${res.task}</span>
-                        
-                        <a href="javascript:void(0)" class="secondary-content task-delete-dialog
+                    <div id="view_${res.id}" class="view-mode row m0">
+                        <div class="text-justify col s12">
+                            <span class="break-word" id="task_span_${res.id}">${res.task}</span>
+                        </div>
+                        <div class="right-align col s12">
+                            <a href="#modal-task-delete" class="secondary-content task-delete-dialog
                             red-text text-accent-2"
-                           data-task-id="${res.id}" title="Delete Task">
-                            <i class="material-icons">delete</i>
-                        </a>
-                        
-                        <a href="javascript:void(0)" class="secondary-content task-edit"
-                           data-task-id="${res.id}">
-                            <i class="material-icons">mode_edit</i>
-                        </a>
+                            data-task-id="${res.id}" title="Delete Task">
+                                <i class="material-icons">delete</i>
+                            </a>
+                            
+                            <a href="javascript:void(0)" class="secondary-content task-edit"
+                            data-task-id="${res.id}">
+                                <i class="material-icons">mode_edit</i>
+                            </a>
+                        </div>  
                     </div>
                     
                     <div id="edit_${res.id}" class="edit-mode" style="display: none">
                         <form id="task_form_${res.id}" class="col s10">
                             <input type="hidden" name="_token" value="${token}">
-                            <div class="row">
+                            <div class="row valign-wrapper">
                                 <div class="input-field col s10">
-                                    <input placeholder="Enter task name" id="task_input_${res.id}"
-                                           type="text" class="validate" name="task" 
-                                           data-task-id="${res.id}">
+                                                                                
+                                   <textarea id="task_input_${res.id}" name="task" 
+                                    class="materialize-textarea validate" 
+                                    data-task-id="${res.id}"
+                                    maxlength="255"></textarea>
                                 </div>
-                                <div class="col s2">
-                                <a href="javascript:void(0)" class="secondary-content 
+                                <div class="col s2 valign">
+                                    <a href="javascript:void(0)" class="secondary-content 
                                         task-edit-cancel red-text text-accent-2" 
                                          data-task-id="${res.id}">
                                         <i class="material-icons font-35">not_interested</i>

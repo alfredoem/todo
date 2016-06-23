@@ -144,3 +144,27 @@ main {
     box-shadow: 0 2.5em 0 0;
   }
 }
+
+
+.overlay {
+  position: absolute;
+  top:0;
+  left:0;
+  width: 100%;
+  height:100%;
+  z-index:2;
+  opacity:0.4;
+  filter: alpha(opacity = 50)
+}
+
+.m0 {
+  margin: 0;
+}
+
+.text-justify {
+  text-align: justify;
+}
+
+.break-word {
+  word-wrap: break-word;
+}

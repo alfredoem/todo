@@ -21,7 +21,7 @@ $(document).on('click', '.task-store', function(e){
     Todo.store();
 });
 
-$(document).on("keypress", "input", function(e) {
+$(document).on("keypress", "textarea", function(e) {
 
     if (e.keyCode == 13) {
         e.preventDefault();
@@ -92,6 +92,5 @@ $('main').on('click', '.pagination a', function (e) {
 });
 
 $(document).ready(function(){
-    $('.task-delete-dialog').leanModal({dismissible: false});
     Todo.all(1);
 });
