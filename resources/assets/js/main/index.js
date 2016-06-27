@@ -1,12 +1,3 @@
-var Todo = require('../components/Todo');
-
-$('main').on('click', '.pagination a', function (e) {
-    e.preventDefault();
-    $('.pagination').find('li').removeClass('active disabled');
-    $(this).parent().addClass('active');
-    vm.paginate($(this).attr('href').split('page=')[1]);
-});
-
 var vm = new Vue({
     el: 'main',
     data: {
@@ -15,7 +6,9 @@ var vm = new Vue({
         loading: true,
         taskDialog: { id: 0, task: ''},
         showCreate: true,
-        showCancel: false
+        showCancel: false,
+        pagination: { total: 0, per_page: 0, current_page: 0, last_page: 0, next_page_url: null,
+                        prev_page_url: null, from: 0, to: 0 }
     },
     ready: function () {
         let self = this;
@@ -26,16 +19,44 @@ var vm = new Vue({
             self.renderTodos(res);
         });
     },
-    methods: {
-        paginate: function(page) {
-            this.createCancel();
+
+    computed: {
+        pages: function() {
+            let pages = [];
+
+            for (let i = 1; i <= this.pagination.last_page; i++) {
+
+                if (this.pagination.current_page == i) {
+                    pages.push({n: i, clase: 'active'});
+                } else {
+                    pages.push({n: i, clase: ''});
+                }
+
+            }
             
+            return pages;
+        }
+    },
+    methods: {
+        paginate: function(e) {
+            e.preventDefault();
+            let page = $(e.target).attr('href').split('page=')[1];
+
+            this.createCancel();
+
+            $('.pagination').find('li').removeClass('active disabled');
+
+            if ($(e.target).data('apply-active')) {
+                $(e.target).parent().addClass('active');
+            }
+
             let container = $('#pagination-container');
             container.fadeTo('slow', .6);
             container.append('<div id="container-disabled" class="overlay"></div>');
 
             let request = $.ajax({url : 'todo?page=' + page, dataType: 'json'});
             let self = this;
+            
             request.done(function (res) {
                 container.fadeTo('slow', 1);
                 container.find('#container-disabled').remove();
@@ -123,7 +144,8 @@ var vm = new Vue({
 
             this.taskDialog.id = id;
             this.taskDialog.task = task.html().trim();
-            $('#modal-task-delete').openModal();
+
+            $('#modal-task-delete').openModal({dismissible: false});
         },
         deleteCancel: function(e) {
             e.preventDefault();
@@ -135,8 +157,7 @@ var vm = new Vue({
             e.preventDefault();
             let modal = $('#modal-task-delete');
             let page = this.getActivePage();
-            let id = this.taskDialog.id;
-            let url = (page) ? `todo/${id}?page=${id}` : `todo/${id}`;
+            let url = (page) ? `todo/${this.taskDialog.id}?page=${page}` : `todo/${page}`;
             let request = $.ajax({url: url, type: 'delete', data: {_token: $('#_token').val()}});
             var self = this;
 
@@ -148,8 +169,7 @@ var vm = new Vue({
 
         renderTodos: function(res) {
             this.todos = res.data;
-            $('.task-delete-dialog').leanModal({dismissible: false});
-            Todo.renderPagination(res);
+            this.pagination = res;
         },
 
         getActivePage: function() {

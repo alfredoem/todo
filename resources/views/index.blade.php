@@ -13,8 +13,8 @@
                             @{{ todo.task }}</span>
                     </div>
                     <div class="right-align col s12">
-                        <a href="#modal-task-delete" class="secondary-content
-                            red-text text-accent-2" data-task-id="@{{todo.id}}"
+                        <a href="#modal-task-delete" class="secondary-content red-text
+                         text-accent-2 task-delete-dialog" data-task-id="@{{todo.id}}"
                            title="Delete Task" v-on:click="deleteDialog(todo.id, $event)">
                             <i class="material-icons">delete</i>
                         </a>
@@ -34,7 +34,7 @@
                             <div class="input-field col s10">
                                    <textarea id="task_input_@{{todo.id}}" name="task"
                                      class="materialize-textarea validate" data-task-id="@{{todo.id}}"
-                                     maxlength="255" v:on:keyup:esc="editCancel(todo.id, $event)"
+                                     maxlength="255" v-on:keyup.esc="editCancel(todo.id, $event)"
                                      v-on:keyup.enter="update(todo.id, $index, $event)">@{{ todo.task }}</textarea>
                             </div>
                             <div class="col s2 valign">
@@ -55,9 +55,32 @@
 
                 </div>
             </li>
+
+            <li v-if=" ! todos.length" class="collection-item grey lighten-4 grey-text">
+                [ Add Your first Task ]</li>
         </ul>
 
-        <div id="pagination-container"></div>
+        <div v-show=" ! loading" id="pagination-container">
+            <ul class="pagination" v-if="pagination.total">
+                <li>
+                    <a v-if="pagination.prev_page_url" href="@{{ pagination.prev_page_url }}" aria-label="Previous" v-on:click="paginate">&laquo;</a>
+
+                    <span v-if="! pagination.prev_page_url" aria-hidden="true">&laquo;</span>
+
+                </li>
+
+                <li  v-for="page in pages" v-bind:class="page.clase">
+                    <a v-if="! page.clase" href="todo?page=@{{ page.n }}" data-apply-active="true" v-on:click="paginate">@{{ page.n }}</a>
+                    <span v-if="page.clase">@{{ page.n }}</span>
+                </li>
+                <li>
+                    <a v-if="pagination.next_page_url" href="@{{ pagination.next_page_url }}" aria-label="Next" v-on:click="paginate">&raquo;</a>
+
+                    <span v-if="! pagination.next_page_url" aria-hidden="true">&raquo;</span>
+
+                </li>
+            </ul>
+        </div>
 
         <input type="hidden" id="_token" value="{{csrf_token()}}">
 
