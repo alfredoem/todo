@@ -45,7 +45,10 @@ gulp.task('material-icons', function(){
 
 gulp.task('materialize-scripts', function(){
     gulp
-        .src([modules + 'jquery/dist/jquery.min.js', modules + 'materialize-css/dist/js/materialize.min.js'])
+        .src([
+            modules + 'vue/dist/vue.min.js',
+            modules + 'jquery/dist/jquery.min.js',
+            modules + 'materialize-css/dist/js/materialize.min.js'])
         .pipe(concat('materialize.min.js'))
         .pipe(gulp.dest('public/js/libs'))
 });
