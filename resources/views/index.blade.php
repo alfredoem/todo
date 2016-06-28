@@ -1,27 +1,13 @@
 @extends('layouts.main')
 @section('container')
 
+
     <main>
-        <ul id="todo-list" class="collection with-header">
-            <li class="collection-header"><h4 class="red-text">TODO</h4></li>
-            <li><div class="loader">Loading...</div></li>
-        </ul>
+        <div id="todo-container"><div class="loader">Loading...</div></div>
 
         <div id="pagination-container"></div>
 
         <input type="hidden" id="_token" value="{{csrf_token()}}">
-
-        <!-- Modal Structure -->
-        <div id="modal-task-delete" class="modal" data-taget-id="0">
-            <div class="modal-content">
-                <h4>Are sure want to delete record?</h4>
-                <p id="task-to-delete-text">---</p>
-            </div>
-            <div class="modal-footer">
-                <a href="javascript:void(0)" class="waves-effect waves-red btn-flat task-delete-cancel">Cancel</a>
-                <a href="javascript:void(0)" class="waves-effect waves-green btn-flat task-delete">Delete</a>
-            </div>
-        </div>
 
     </main>
 

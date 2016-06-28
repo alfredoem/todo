@@ -1,96 +1,81 @@
-//$(".button-collapse").sideNav();
+var React = require('react');
+var ReactDOM = require('react-dom');
+var Task = require('../components/Task');
+var Dialog = require('../components/Dialog');
 
-var Todo = require('../components/Todo');
+var Todo = React.createClass({
 
-$(document).on('click', '.task-create', function(e){
-    e.preventDefault();
-    console.log('create');
-    $('.task-create').hide();
-    Todo.create();
-});
+    getInitialState: function () {
+      return {
+          todo: [],
+          pagination: {},
+          token: ''
+      }
+    },
 
-$(document).on('click', '.task-create-cancel', function(e){
-    e.preventDefault();
-    console.log('task-create-cancel');
-    Todo.createCancel();
-});
+    componentDidMount: function() {
 
-$(document).on('click', '.task-store', function(e){
-    e.preventDefault();
-    console.log('create');
-    Todo.store();
-});
+        this.serverRequest = $.get(this.props.source, function(res){
 
-$(document).on("keypress", "textarea", function(e) {
+           let data = res.data;
+           delete res.data;
 
-    if (e.keyCode == 13) {
+           this.setState({
+               todo: data,
+               pagination: res,
+               token: document.getElementById('_token').value});
+
+        }.bind(this));
+    },
+
+    componentWillUnmount: function() {
+        this.serverRequest.abort();
+    },
+
+    deleteDialog: function(id, e) {
         e.preventDefault();
-        let id = $(this).data('task-id');
 
-        if ($('#task_0').length) {
-            Todo.store();
-        } else {
-            Todo.update(id);
-        }
+        this.setState({deleteId: id});
 
-        return false;
-    } else if (e.keyCode == 27) {
-        let id = $(this).data('task-id');
-        if (id == 0) {
-            Todo.createCancel();
-        } else {
-            Todo.editCancel(id);
-        }
+        let modal = $('#modal-task-delete');
+        let task = $(`#task_span_${id}`);
+
+        $(`#task_${id}`).addClass('red accent-1');
+
+        modal.find('#task-to-delete-text').html(task.html().trim());
+        modal.openModal({dismissible: false});
+    },
+
+    renderTodos: function(res) {
+
+        let data = res.data;
+        delete res.data;
+
+        this.setState({todo: data, pagination: res});
+    },
+
+    render: function() {
+
+        return (
+            <div>
+                <ul id="todo-list" className="collection with-header">
+                    <li className="collection-header"><h4 className="red-text">TODO React</h4></li>
+                    {
+                        this.state.todo.map(function(row){
+                            return <Task key={row.id} token={this.state.token} data={row}
+                                         deleteDialog={this.deleteDialog} ></Task>
+                        }, this)
+                    }
+                </ul>
+    
+                <Dialog deleteId={this.state.deleteId} renderTodos={this.renderTodos}></Dialog>
+            </div>
+        );
     }
 
 });
 
-$(document).on('click', '.task-edit', function(e){
-    e.preventDefault();
-    console.log('edit');
-    let id = $(this).data('task-id');
-    Todo.edit(id);
-});
 
-$(document).on('click', '.task-edit-cancel', function(e){
-    e.preventDefault();
-    console.log('edit-cancel');
-    let id = $(this).data('task-id');
-    Todo.editCancel(id);
-});
-
-$(document).on('click', '.task-update', function(e){
-    e.preventDefault();
-    console.log('update');
-    let id = $(this).data('task-id');
-    Todo.update(id);
-});
-
-$(document).on('click', '.task-delete-dialog', function(e){
-    e.preventDefault();
-    console.log('delete-dialog');
-    let id = $(this).data('task-id');
-    Todo.deleteDialog(id);
-});
-
-$(document).on('click', '.task-delete-cancel', function(e){
-    e.preventDefault();
-    Todo.deleteCancel();
-});
-
-$(document).on('click', '.task-delete', function(e){
-    e.preventDefault();
-    console.log('delete');
-    Todo.delete();
-});
-
-$('main').on('click', '.pagination a', function (e) {
-    $('.pagination').find('li').removeClass('active disabled');
-    $(this).parent().addClass('active');
-    Todo.all($(this).attr('href').split('page=')[1]);
-    e.preventDefault();
-});
-
-$(document).ready(function(){
-    Todo.all(1);
-});
+ReactDOM.render(
+  <Todo source="todo"/>, document.getElementById('todo-container')
+);
