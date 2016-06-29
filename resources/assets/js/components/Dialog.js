@@ -1,11 +1,13 @@
+// resources/assets/js/components/Dialog.js
+
 var React = require('react');
 
 module.exports = React.createClass({
 
-    getActivePage: function() {
-        let container = $('.pagination');
-        let active = container.find('li.active');
-        return (container.length && active.length) ? active.find('span').html().trim() : null;
+    getInitialState: function() {
+      return {
+          loader: false
+      }
     },
 
     deleteCancel: function(e){
@@ -17,13 +19,15 @@ module.exports = React.createClass({
 
     delete: function(e) {
         e.preventDefault();
+        this.setState({loader: true});
         let modal = $('#modal-task-delete');
-        let page = this.getActivePage();
+        let page = this.props.activePage();
         let url = (page) ? `todo/${this.props.deleteId}?page=${page}` : `todo/${this.props.deleteId}`;
         let request = $.ajax({url: url, type: 'delete', data: {_token: $('#_token').val()}});
         var self = this;
 
         request.done(function(res){
+            self.setState({loader: false});
             modal.closeModal();
             self.props.renderTodos(res);
         });
@@ -36,7 +40,7 @@ module.exports = React.createClass({
                     <h4>Are sure want to delete record?</h4>
                     <p id="task-to-delete-text">---</p>
                 </div>
-                <div className="modal-footer">
+                <div className={this.state.loader ? 'overlay modal-footer' : "modal-footer"}>
                     <a href="javascript:void(0)" className="waves-effect waves-red btn-flat task-delete-cancel" onClick={this.deleteCancel}>Cancel</a>
                     <a href="javascript:void(0)" className="waves-effect waves-green btn-flat task-delete" onClick={this.delete}>Delete</a>
                 </div>

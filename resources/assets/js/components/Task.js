@@ -1,5 +1,6 @@
+// resources/assets/js/components/Task.js
+
 var React = require('react');
-var ReactDOM = require('react-dom');
 
 module.exports = React.createClass({
 
@@ -8,7 +9,8 @@ module.exports = React.createClass({
             modeEdit: false,
             id: 0,
             task: '',
-            editTask: ''
+            editTask: '',
+            loader: false
         }
     },
 
@@ -21,6 +23,9 @@ module.exports = React.createClass({
     },
 
     update: function() {
+
+        this.setState({loader: true});
+
         let id = this.state.id;
 
         let form = $(`#task_form_${id}`);
@@ -28,12 +33,12 @@ module.exports = React.createClass({
         let self = this;
 
         request.done(function(res){
-            self.setState({modeEdit: false, id: res.id, task: res.task})
+            self.setState({modeEdit: false, id: res.id, task: res.task, loader: false})
         });
     },
 
     edit: function() {
-        this.setState({modeEdit: true});
+        this.setState({modeEdit: true}, () => $(`#task_input_${this.state.id}`).select());
     },
 
     editCancel: function() {
@@ -44,10 +49,13 @@ module.exports = React.createClass({
         this.setState({editTask: e.target.value});
     },
 
-    getActivePage: function() {
-        let container = $('.pagination');
-        let active = container.find('li.active');
-        return (container.length && active.length) ? active.find('span').html().trim() : null;
+    handleKeyUp: function(e) {
+        if ((e.keyCode == 10 || e.keyCode == 13) && e.ctrlKey) {
+            return this.update();
+        } else if (e.keyCode == 27) {
+            this.setState({value: ''});
+            return this.editCancel();
+        }
     },
 
     render: function() {
@@ -74,14 +82,16 @@ module.exports = React.createClass({
                 </div>
             </div>
 
-            <div id={`edit_${id}`} className={this.state.modeEdit ? 'edit-mode' : 'hidden'}>
+            <div id={`edit_${id}`} className={this.state.modeEdit ? 'edit-mode ' + (this.state.loader ? 'overlay' : '') : 'hidden'}>
                 <form id={`task_form_${id}`} className="col s10">
                     <input type="hidden" name="_token" value={this.props.token} />
                     <div className="row valign-wrapper">
                         <div className="input-field col s10">
-                            <textarea id={`task_input_${id}`} name="task"
-                                className="materialize-textarea validate" maxlength="255"
-                                  value={this.state.editTask} onChange={this.onChange.bind(this, null)}></textarea>
+                            <textarea id={`task_input_${id}`} name="task" maxlength="255"
+                              className="materialize-textarea validate"
+                              value={this.state.editTask}
+                              onChange={this.onChange.bind(this, null)} onKeyUp={this.handleKeyUp}>
+                            </textarea>
                         </div>
                         <div className="col s2 valign">
                             <a href="javascript:void(0)" className="secondary-content
