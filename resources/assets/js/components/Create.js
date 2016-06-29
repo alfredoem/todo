@@ -57,14 +57,13 @@ module.exports = React.createClass({
                             <div className="input-field col s10">
                                 <textarea id="task_input_0" name="task"
                                   className="materialize-textarea validate" maxlength="255"
-                                  data-v-on-keyup-enter="store"
-                                  data-v-on-keyup-esc="createCancel" value={this.state.value}
+                                  value={this.state.value}
                                   onChange={this.onChange} onKeyUp={this.handleKeyUp}>
                                 </textarea>
                                 <label for="task_input_0">Task Description</label>
                             </div>
                             <div className="col s2 valign">
-                                <a href="javascript:void(0)" className="secondary-content task-store"
+                                <a href="javascript:void(0)" className="secondary-content"
                                    onClick={this.store}>
                                     <i className="medium material-icons ">done</i>
                                 </a>

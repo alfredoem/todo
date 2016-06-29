@@ -11,7 +11,6 @@ class TodoController extends Controller
 {
     public function index()
     {
-        sleep(2);
         return Todo::orderBy('id', 'desc')->paginate(7)->setPath(url('todo'));
     }
 

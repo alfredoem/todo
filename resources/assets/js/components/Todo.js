@@ -97,6 +97,13 @@ module.exports = React.createClass({
                       deleteDialog={this.deleteDialog}>
                 </List>
 
+                <div className={ ! this.state.todo.length && ! this.state.showLoading ? 'container' : 'hidden'}>
+                    <div className="collection-item grey lighten-4 center-align">
+                        <a href="javascript:void(0)" onClick={this.create} className="grey-text">
+                            [ Add Your First Task ]</a>
+                    </div>
+                </div>
+
                 <Dialog deleteId={this.state.deleteId} renderTodos={this.renderTodos}
                         activePage={this.getActivePage}>
                 </Dialog>

@@ -7,7 +7,8 @@ module.exports = React.createClass({
 
     render: function() {
         return (
-            <ul id="todo-list" className="collection with-header">
+            <ul id="todo-list"
+                className={this.props.todo.length ? 'collection with-header' : 'hidden'}>
                 {
                     this.props.todo.map(function(row){
                         return <Task key={row.id} token={this.props.token} data={row}

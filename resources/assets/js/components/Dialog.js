@@ -35,14 +35,14 @@ module.exports = React.createClass({
 
     render: function() {
         return (
-            <div id="modal-task-delete" className="modal" data-taget-id="0">
+            <div id="modal-task-delete" className="modal">
                 <div className="modal-content">
                     <h4>Are sure want to delete record?</h4>
                     <p id="task-to-delete-text">---</p>
                 </div>
                 <div className={this.state.loader ? 'overlay modal-footer' : "modal-footer"}>
-                    <a href="javascript:void(0)" className="waves-effect waves-red btn-flat task-delete-cancel" onClick={this.deleteCancel}>Cancel</a>
-                    <a href="javascript:void(0)" className="waves-effect waves-green btn-flat task-delete" onClick={this.delete}>Delete</a>
+                    <a href="javascript:void(0)" className="waves-effect waves-red btn-flat" onClick={this.deleteCancel}>Cancel</a>
+                    <a href="javascript:void(0)" className="waves-effect waves-green btn-flat" onClick={this.delete}>Delete</a>
                 </div>
             </div>
         );

@@ -24,17 +24,21 @@ module.exports = React.createClass({
 
     update: function() {
 
-        this.setState({loader: true});
+        if (this.state.editTask.trim()) {
+            this.setState({loader: true});
 
-        let id = this.state.id;
+            let id = this.state.id;
 
-        let form = $(`#task_form_${id}`);
-        let request = $.ajax({url: 'todo/' + id, type: 'patch', data: form.serialize()});
-        let self = this;
+            let form = $(`#task_form_${id}`);
+            let request = $.ajax({url: 'todo/' + id, type: 'patch', data: form.serialize()});
+            let self = this;
 
-        request.done(function(res){
-            self.setState({modeEdit: false, id: res.id, task: res.task, loader: false})
-        });
+            request.done(function (res) {
+                self.setState({modeEdit: false, id: res.id, task: res.task, loader: false})
+            });
+        } else {
+            $(`#task_input_${this.state.id}`).addClass('invalid').focus();
+        }
     },
 
     edit: function() {
@@ -69,13 +73,13 @@ module.exports = React.createClass({
                     <span className="break-word" id={`task_span_${id}`}>{this.state.task}</span>
                 </div>
                 <div className="right-align col s12">
-                    <a href="#modal-task-delete" className="secondary-content task-delete-dialog
-                            red-text text-accent-2" title="Delete Task"
+                    <a href="#modal-task-delete" className="secondary-content red-text
+                       text-accent-2" title="Delete Task"
                        onClick={this.props.deleteDialog.bind(null, id)}>
                         <i className="material-icons">delete</i>
                     </a>
 
-                    <a href="javascript:void(0)" className="secondary-content task-edit"
+                    <a href="javascript:void(0)" className="secondary-content"
                        onClick={this.edit.bind(this, null)}>
                         <i className="material-icons">mode_edit</i>
                     </a>
@@ -94,14 +98,13 @@ module.exports = React.createClass({
                             </textarea>
                         </div>
                         <div className="col s2 valign">
-                            <a href="javascript:void(0)" className="secondary-content
-                                        task-edit-cancel red-text text-accent-2"
-                            onClick={this.editCancel}>
+                            <a href="javascript:void(0)" className="secondary-content red-text
+                            text-accent-2" onClick={this.editCancel}>
                                 <i className="material-icons font-35">not_interested</i>
                             </a>
 
-                            <a href="javascript:void(0)" className="secondary-content task-update"
-                            onClick={this.update}>
+                            <a href="javascript:void(0)" className="secondary-content"
+                               onClick={this.update}>
                                 <i className="material-icons font-35">done</i>
                             </a>
                         </div>
