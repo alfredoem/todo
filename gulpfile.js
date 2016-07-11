@@ -6,10 +6,12 @@ var concat = require('gulp-concat');
 
 var uglify = require('gulp-uglify');
 var browserify = require('browserify');
-var babel = require('babelify');
+var babel = require('gulp-babel');
 var source = require('vinyl-source-stream');
 var watchify = require('watchify');
 var buffer = require('vinyl-buffer');
+
+var livereload = require('gulp-livereload');
 
 var modules = './node_modules/';
 
@@ -28,6 +30,7 @@ gulp.task('roboto-fonts', function(){
 
     gulp
         .src(modules + 'materialize-css/fonts/roboto/*')
+        .pipe(babel())
         .pipe(gulp.dest('./public/fonts/roboto'))
 
 });
@@ -46,42 +49,28 @@ gulp.task('material-icons', function(){
 gulp.task('materialize-scripts', function(){
     gulp
         .src([
-            modules + 'react/dist/react.min.js',
+            //modules + 'react/dist/react.min.js',
+            modules + 'angular/angular.min.js',
             modules + 'jquery/dist/jquery.min.js',
             modules + 'materialize-css/dist/js/materialize.min.js'])
         .pipe(concat('materialize.min.js'))
         .pipe(gulp.dest('public/js/libs'))
 });
 
-var bundleScript = function(watch) {
 
-    var bundle = browserify('resources/assets/js/main/index.js', {debug: true});
+gulp.task('script', function(){
 
-    if (watch) {
-        bundle = watchify(bundle);
-        bundle.on('update', function(){
-            console.log(new Date() + ' --> Bundling');
-            rebundle();
-        })
-    }
+    console.log(new Date());
+    
+    gulp.src([
+        'resources/assets/js/index.js',
+        'resources/assets/js/src/*.js'
+        ])
+        .pipe(concat('app.min.js'))
+        .pipe(babel({"presets": ["es2015"]}))
+        .pipe(gulp.dest('public/js/main'));
 
-    function rebundle() {
-        bundle
-            .transform(babel, {presets: ['es2015', 'react']})
-            .bundle()
-            .on('error', function(err) {console.log(err); this.emit('end')})
-            .pipe(source('index.js'))
-            /*.pipe(buffer())
-            .pipe(uglify())*/
-            .pipe(rename('app.min.js'))
-            .pipe(gulp.dest('public/js/main'))
-    }
-
-    rebundle();
-};
-
-gulp.task('bundle-script', function(){
-    return bundleScript();
+    
 });
 
 gulp.task('watch-materialize', function(){
@@ -91,9 +80,14 @@ gulp.task('watch-materialize', function(){
     ], ['materialize-css']);
 });
 
-gulp.task('watch-script', function(){ return bundleScript(true)});
+gulp.task('watch-script', function(){
+    livereload.listen();
+
+    gulp.watch(['resources/assets/js/**/*.js', 'resources/**/*.blade.php', 'public/partials/*.html'],
+        ['script', livereload.reload]);
+});
 
 gulp.task('default', ['materialize-css', 'roboto-fonts', 
-                      'material-icons', 'materialize-scripts', 'bundle-script']);
+                      'material-icons', 'materialize-scripts', 'script']);
 
 

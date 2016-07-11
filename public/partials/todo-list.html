@@ -1,0 +1,13 @@
+<ul id="todo-list" class="collection with-header">
+    <li data-ng-show="loading">
+        <div class="loader">Loading...</div>
+    </li>
+
+    <li data-ng-repeat="todo in todos" id="task_{{ todo.id }}" class="collection-item">
+        <todo-list-task></todo-list-task>
+    </li>
+
+    <li data-ng-if=" ! todos.length" class="collection-item grey lighten-4 grey-text">
+        [ Add Your first Task ]
+    </li>
+</ul>

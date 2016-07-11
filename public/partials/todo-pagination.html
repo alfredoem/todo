@@ -1,0 +1,34 @@
+<div id="pagination-container" data-ng-controller="PaginationController">
+    <ul data-ng-class="paginationClass()">
+        <li>
+            <a data-ng-class="pagination.prev_page_url ? '' : 'hidden'"
+            data-ng-href={{pagination.prev_page_url}} aria-label="Previous"
+            data-ng-click="paginate($event)">&laquo;</a>
+
+            <span data-ng-class="! pagination.prev_page_url ? '' : 'hidden'" aria-hidden="true">
+            &laquo;</span>
+        </li>
+
+        <li data-ng-repeat="n in [].constructor(pagination.last_page) track by $index"
+            data-ng-class="pagination.current_page == $index + 1 ? 'active' : ''">
+
+            <a data-ng-class="pagination.current_page == $index + 1 ? 'hidden' : ''"
+               data-ng-href="todo?page={{$index + 1}}" data-apply-active="true"
+               data-ng-click="paginate($event)">{{$index + 1}}</a>
+
+            <span data-ng-class="pagination.current_page == $index + 1 ? '' : 'hidden'">
+                {{$index + 1}}
+            </span>
+        </li>
+
+        <li>
+            <a data-ng-class="pagination.next_page_url ? '' : 'hidden'"
+               data-ng-href={{pagination.next_page_url}} aria-label="Next"
+               data-ng-click="paginate($event)">&raquo;</a>
+
+            <span data-ng-class=" ! pagination.next_page_url ? '' : 'hidden'" aria-hidden="true">
+                &raquo;</span>
+
+        </li>
+    </ul>
+</div>

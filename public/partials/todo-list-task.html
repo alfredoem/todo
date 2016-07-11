@@ -1,0 +1,50 @@
+<div data-ng-controller="TaskController">
+
+    <div id="task_{{id}}" data-ng-class="modeEdit ? 'hidden' : 'view-mode row m0'">
+        <div class="text-justify col s12">
+            <span data-ng-class="break-word">{{task}}</span>
+        </div>
+        <div class="right-align col s12">
+            <a href="#modal-task-delete" class="secondary-content red-text
+                       text-accent-2" title="Delete Task"
+               data-ng-click="deleteDialog($event)">
+                <i class="material-icons">delete</i>
+            </a>
+
+            <a href="javascript:void(0)" class="secondary-content"
+               data-ng-click="edit()">
+                <i class="material-icons">mode_edit</i>
+            </a>
+        </div>
+    </div>
+
+    <div data-ng-class="modeEdit ? 'edit-mode ' + (loader ? 'overlay' : '') : 'hidden'">
+        <form class="col s10">
+            <input type="hidden" name="_token" value={this.props.token}/>
+            <div class="row valign-wrapper">
+                <div class="input-field col s10">
+            <textarea id="task_input_{{id}}" name="task" maxlength="255"
+                      class="materialize-textarea validate"
+                      data-ng-model="editTask"
+                      data-ng-keyup="handleKeyUp($event)">
+            </textarea>
+                </div>
+                <div class="col s2 valign">
+                    <a href="javascript:void(0)" class="secondary-content red-text
+                            text-accent-2" data-ng-click="editCancel()">
+                        <i class="material-icons font-35">not_interested</i>
+                    </a>
+
+                    <a href="javascript:void(0)" class="secondary-content"
+                       data-ng-click="update()">
+                        <i class="material-icons font-35">done</i>
+                    </a>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

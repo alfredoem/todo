@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
     <title>Seventh Heaven</title>
     <link rel="stylesheet" href="{{asset('css/main/materialize.min.css')}}">
-</head>
 <body>
 @include('layouts.partials.header')
 
