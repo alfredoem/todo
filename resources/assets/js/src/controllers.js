@@ -43,8 +43,7 @@ angular
     .controller('PaginationController', ['$scope', '$http', function($scope, $http){
 
         $scope.paginationClass = function() {
-            return ($scope.pagination.total > 1 &&
-                    $scope.pagination.current_page < $scope.pagination.last_page)
+            return ($scope.pagination.last_page > 1)
                     ? 'pagination' : 'hide';
         };
 
